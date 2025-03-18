@@ -6,7 +6,6 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
   editorConfigFactory,
-  convertLexicalToMarkdown,
 } from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@/fields/linkGroup'

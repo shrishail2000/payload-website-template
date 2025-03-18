@@ -67,7 +67,6 @@ export default buildConfig({
   collections: [Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  serverURL: "http://localhost:3000",
   plugins: [
     ...plugins,
     // storage-adapter-placeholder
