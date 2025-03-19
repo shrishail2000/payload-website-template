@@ -147,6 +147,7 @@ export interface UserAuthOperations {
 export interface Page {
   id: string;
   title: string;
+  markdownBody?: string | null;
   hero: {
     type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
     richText?: {
@@ -190,13 +191,15 @@ export interface Page {
       | null;
     media?: (string | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  body: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
   meta?: {
     title?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
     image?: (string | null) | Media;
+    canonical?: string | null;
+    summary?: string | null;
     description?: string | null;
   };
   publishedAt?: string | null;
@@ -986,6 +989,7 @@ export interface PayloadMigration {
  */
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
+  markdownBody?: T;
   hero?:
     | T
     | {
@@ -1008,7 +1012,7 @@ export interface PagesSelect<T extends boolean = true> {
             };
         media?: T;
       };
-  layout?:
+  body?:
     | T
     | {
         cta?: T | CallToActionBlockSelect<T>;
@@ -1022,6 +1026,8 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         title?: T;
         image?: T;
+        canonical?: T;
+        summary?: T;
         description?: T;
       };
   publishedAt?: T;
@@ -1641,15 +1647,10 @@ export interface TaskSchedulePublish {
   input: {
     type?: ('publish' | 'unpublish') | null;
     locale?: string | null;
-    doc?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
+    doc?: {
+      relationTo: 'posts';
+      value: string | Post;
+    } | null;
     global?: string | null;
     user?: (string | null) | User;
   };

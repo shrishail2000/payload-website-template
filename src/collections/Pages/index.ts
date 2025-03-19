@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { type CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
@@ -9,9 +9,7 @@ import { FormBlock } from '../../blocks/Form/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { hero } from '@/heros/config'
 import { slugField } from '@/fields/slug'
-import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
-import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 
 import {
   MetaDescriptionField,
@@ -20,6 +18,7 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { ValidatedField } from '@/components/random/validatedField'
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -64,6 +63,11 @@ export const Pages: CollectionConfig<'pages'> = {
       required: true,
     },
     {
+      name: 'markdownBody',
+      type: 'text',
+      hidden: true,
+    },
+    {
       type: 'tabs',
       tabs: [
         {
@@ -73,7 +77,7 @@ export const Pages: CollectionConfig<'pages'> = {
         {
           fields: [
             {
-              name: 'layout',
+              name: 'body',
               type: 'blocks',
               blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
               required: true,
@@ -82,7 +86,7 @@ export const Pages: CollectionConfig<'pages'> = {
               },
             },
           ],
-          label: 'Content',
+          label: 'Body',
         },
         {
           name: 'meta',
@@ -103,7 +107,20 @@ export const Pages: CollectionConfig<'pages'> = {
             MetaImageField({
               relationTo: 'media',
             }),
+            ValidatedField,
+            {
+              name: 'summary',
+              type: 'text',
+              admin: {
+                components: {
+                  Field: {
+                    path: '/components/random/aiSummaryField',
+                    exportName: 'AiSummaryField',
+                  },
 
+                }
+              }
+            },
             MetaDescriptionField({}),
             PreviewField({
               // if the `generateUrl` function is configured
@@ -127,17 +144,18 @@ export const Pages: CollectionConfig<'pages'> = {
     ...slugField(),
   ],
   hooks: {
-    afterChange: [revalidatePage],
-    beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    // afterChange: [revalidatePage],
+    // beforeChange: [populatePublishedAt],
+    // afterDelete: [revalidateDelete],
   },
   versions: {
-    drafts: {
-      autosave: {
-        interval: 100, // We set this interval for optimal live preview
-      },
-      schedulePublish: true,
-    },
-    maxPerDoc: 50,
+    drafts: true,
+    // drafts: {
+      // autosave: {
+      //   interval: 100, // We set this interval for optimal live preview
+      // },
+      // schedulePublish: true,
+    // },
+    // maxPerDoc: 50,
   },
 }
